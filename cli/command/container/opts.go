@@ -74,6 +74,10 @@ type containerOptions struct {
 	containerIDFile    string
 	entrypoint         string
 	hostname           string
+	netBWUpRate        opts.NetBandwidthBytes
+	netBWUpCeil        opts.NetBandwidthBytes
+	netBWDownRate      opts.NetBandwidthBytes
+	netBWDownCeil      opts.NetBandwidthBytes
 	memory             opts.MemBytes
 	memoryReservation  opts.MemBytes
 	memorySwap         opts.MemSwapBytes
@@ -263,6 +267,10 @@ func addFlags(flags *pflag.FlagSet) *containerOptions {
 	flags.SetAnnotation("io-maxbandwidth", "ostype", []string{"windows"})
 	flags.Uint64Var(&copts.ioMaxIOps, "io-maxiops", 0, "Maximum IOps limit for the system drive (Windows only)")
 	flags.SetAnnotation("io-maxiops", "ostype", []string{"windows"})
+	flags.Var(&copts.netBWUpRate, "network-uprate-bps", "Limit network up rate bandwidth")
+	flags.Var(&copts.netBWUpCeil, "network-upceil-bps", "Limit network up ceil bandwidth")
+	flags.Var(&copts.netBWDownRate, "network-downrate-bps", "Limit network down rate bandwidth")
+	flags.Var(&copts.netBWDownCeil, "network-downceil-bps", "Limit network down ceil bandwidth")
 	flags.Var(&copts.kernelMemory, "kernel-memory", "Kernel memory limit")
 	flags.VarP(&copts.memory, "memory", "m", "Memory limit")
 	flags.Var(&copts.memoryReservation, "memory-reservation", "Memory soft limit")
@@ -527,6 +535,10 @@ func parse(flags *pflag.FlagSet, copts *containerOptions) (*containerConfig, err
 		Ulimits:              copts.ulimits.GetList(),
 		DeviceCgroupRules:    copts.deviceCgroupRules.GetAll(),
 		Devices:              deviceMappings,
+		NetBWUpRate:          copts.netBWUpRate.Value(),
+		NetBWUpCeil:          copts.netBWUpCeil.Value(),
+		NetBWDownRate:        copts.netBWDownRate.Value(),
+		NetBWDownCeil:        copts.netBWDownCeil.Value(),
 	}
 
 	config := &container.Config{
